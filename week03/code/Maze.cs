@@ -30,37 +30,47 @@ public class Maze
     /// Check to see if you can move left.  If you can, then move.  If you
     /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
     /// </summary>
-    public void MoveLeft()
+
+    private void UpdatePosition(int dirIndex, int dx, int dy)
     {
-        // FILL IN CODE
+        var key = (_currX, _currY);
+        if (!_mazeMap.TryGetValue(key, out var dirs))
+        {
+            throw new InvalidOperationException("Can't go that way!");
+        }
+
+        if (dirs == null || dirIndex < 0 || dirIndex >= dirs.Length || !dirs[dirIndex])
+        {
+            throw new InvalidOperationException("Can't go that way!");
+        }
+
+        _currX += dx;
+        _currY += dy;
     }
 
     /// <summary>
     /// Check to see if you can move right.  If you can, then move.  If you
     /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
     /// </summary>
-    public void MoveRight()
-    {
-        // FILL IN CODE
-    }
+       public void MoveLeft() => UpdatePosition(0, -1, 0);
+    public void MoveRight() => UpdatePosition(1, 1, 0);
 
     /// <summary>
     /// Check to see if you can move up.  If you can, then move.  If you
     /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
     /// </summary>
-    public void MoveUp()
-    {
-        // FILL IN CODE
-    }
+    public void MoveUp() => UpdatePosition(2, 0, -1);
 
     /// <summary>
     /// Check to see if you can move down.  If you can, then move.  If you
     /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
     /// </summary>
-    public void MoveDown()
-    {
-        // FILL IN CODE
-    }
+    public void MoveDown() => UpdatePosition(3, 0, 1);
+
+    /// <summary>
+    /// Check to see if you can move down.  If you can, then move.  If you
+    /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
+    /// </summary>
 
     public string GetStatus()
     {

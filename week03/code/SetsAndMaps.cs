@@ -22,7 +22,23 @@ public static class SetsAndMaps
     public static string[] FindPairs(string[] words)
     {
         // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+         var seen = new HashSet<string>();
+        var result = new List<string>();
+
+        foreach (var word in words)
+        {
+            if (word[0] == word[1]) continue; // Skip words with identical letters
+            string reversed = $"{word[1]}{word[0]}";
+            if (seen.Contains(reversed))
+            {
+                result.Add($"{reversed} & {word}");
+            }
+            else
+            {
+                seen.Add(word);
+            }
+        }
+        return result.ToArray();
     }
 
     /// <summary>
@@ -43,8 +59,10 @@ public static class SetsAndMaps
         {
             var fields = line.Split(",");
             // TODO Problem 2 - ADD YOUR CODE HERE
+             string degree = fields[3].Trim();
+                if (degrees.ContainsKey(degree)) degrees[degree]++;
+                else degrees[degree] = 1;
         }
-
         return degrees;
     }
 
@@ -67,7 +85,18 @@ public static class SetsAndMaps
     public static bool IsAnagram(string word1, string word2)
     {
         // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        var clean1 = word1.Replace(" ", "").ToLower();
+        var clean2 = word2.Replace(" ", "").ToLower();
+        if (clean1.Length != clean2.Length) return false;
+
+        var counts = new Dictionary<char, int>();
+        foreach (char c in clean1) counts[c] = counts.GetValueOrDefault(c) + 1;
+        foreach (char c in clean2)
+        {
+            if (!counts.ContainsKey(c) || counts[c] == 0) return false;
+            counts[c]--;
+        }
+        return true;
     }
 
     /// <summary>
@@ -94,13 +123,27 @@ public static class SetsAndMaps
         var json = reader.ReadToEnd();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-        var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
+        var featureCollection = JsonSerializer.Deserialize<USGS.FeatureCollection>(json, options);
 
         // TODO Problem 5:
         // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
         // on those classes so that the call to Deserialize above works properly.
         // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
         // 3. Return an array of these string descriptions.
-        return [];
+        if (featureCollection?.Features == null) return Array.Empty<string>();
+        var summaries = new List<string>();
+        foreach (var f in featureCollection.Features)
+        {
+            var p = f?.Properties;
+            if (p == null) continue;
+            summaries.Add($"{p.Place} - Mag {p.Mag}");
+        }
+        return summaries.ToArray();
     }
+}
+namespace USGS
+{
+    public class FeatureCollection { public List<Feature> Features { get; set; } }
+    public class Feature { public Properties Properties { get; set; } }
+    public class Properties { public double Mag { get; set; } public string Place { get; set; } }
 }
